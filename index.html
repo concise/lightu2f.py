@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<!--
+
+Just a dummy single-page webapp to demonstrate lightu2f's capability
+
+-->
+<meta charset="utf-8">
+<title>U2F Proof-of-Concept Demo</title>
+<style>
+p {
+    line-height: 1.4em;
+}
+code {
+    background-color: #ffffcc;
+}
+</style>
+<pre>Open the JavaScript console and run
+
+  1. <code>try_registering_new_security_key()</code>
+  2. <code>try_authenticating_with_a_security_key()</code>
+
+to see if it works.</pre>
+<script src="/u2f-api.js"></script>
+<script>
+
+var http_post = function (where, text_to_send, callback) {
+    fetch(where, {method: 'POST', body: text_to_send})
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (result) {
+            callback(result);
+        });
+};
+
+var try_registering_new_security_key = function () {
+    http_post('/u2f_register', '', function(req){
+        console.log('server-generated registration request:', req);
+        req = JSON.parse(req);
+        u2f.register(req.registerRequests, req.signRequests, function(res){
+            if (res.errorCode) {
+                console.log('client-generated Error message:', res);
+            } else {
+                res = JSON.stringify(res);
+                console.log('client-generated registration response:', res);
+                http_post('/u2f_register_finish', res, function (msg) {
+                    console.log('registration finished:', msg);
+                });
+            }
+        });
+    });
+};
+
+var try_authenticating_with_a_security_key = function () {
+    http_post('/u2f_authenticate', '', function(req){
+        console.log('server-generated authentication request:', req);
+        req = JSON.parse(req);
+        u2f.sign(req.signRequests, function(res){
+            if (res.errorCode) {
+                console.log('client-generated Error message:', res);
+            } else {
+                res = JSON.stringify(res);
+                console.log('client-generated authentication response:', res);
+                http_post('/u2f_authenticate_finish', res, function (msg) {
+                    console.log('authentication finished:', msg);
+                });
+            }
+        });
+    });
+};
+
+</script>
