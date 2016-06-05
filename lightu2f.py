@@ -727,6 +727,7 @@ def handle_registration_response(request, response):
 # Token[] -> Request
 @quick_hack
 def create_authentication_request(registered_tokens):
+    assert len(registered_tokens) > 0
     challenge_wb64 = wb64encode(generate_random(32))
     return json_serialize({
         'type': 'u2f_sign_request',
