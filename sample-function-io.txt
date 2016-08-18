@@ -1,5 +1,11 @@
 ------------------------------------------------------------------------------
 
+There are two different types of U2F transactions
+    1.  enrollment transaction
+    2.  idassertion transaction
+
+------------------------------------------------------------------------------
+
 FUNCTION generate_enrollment_request
 
 INPUT
@@ -47,7 +53,7 @@ OUTPUT
 
 ------------------------------------------------------------------------------
 
-FUNCTION generate_signature_request
+FUNCTION generate_idassertion_request
 
 INPUT
 
@@ -74,7 +80,7 @@ INPUT
 
 OUTPUT
 
-    signature_request = (string, which will be interpreted using JSON)
+    idassertion_request = (string, which will be interpreted using JSON)
         {
           "type": "u2f_sign_request",
           "signRequests": [
@@ -94,8 +100,8 @@ OUTPUT
         }
 
     The value websafe-base64-encoded in the "challenge" string is a 102-byte value
-    constructed from concatenating <nonce> | <publickey> | <signaturecounterinfo>
-    where the <signaturecounterinfo> is a 5-byte value defined as:
+    constructed from concatenating <nonce> | <publickey> | <counterinfo>
+    where the <counterinfo> is a 5-byte value defined as:
         case <counter> != null -> 0x01 | <counter>
         case <counter> == null -> 0x00 | 0x00000000
 
@@ -146,7 +152,7 @@ NOTICE
 
 ------------------------------------------------------------------------------
 
-FUNCTION process_signature_response
+FUNCTION process_idassertion_response
 
 INPUT
 
@@ -155,9 +161,9 @@ INPUT
 
     nonce = (octet string of length 32)
         "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
-        (_MUST_ equal what we have used in the current U2F signature transaction)
+        (_MUST_ equal what we have used in the current U2F idassertion transaction)
 
-    signature_response = (string, which will be interpreted using JSON)
+    idassertion_response = (string, which will be interpreted using JSON)
         {
           "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
           "keyHandle": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -187,7 +193,7 @@ POSSIBLE ERRORS
 
 NOTICE
 
-    0. you must maintain the integrity of nonce for this signature transaction
+    0. you must maintain the integrity of nonce for this idassertion transaction
     1. you must check the facetid by yourself
     2. you must apply your own cloning prevention policy for counter validity...
        please note oldcounter might be null, which is valid for any newcounter
