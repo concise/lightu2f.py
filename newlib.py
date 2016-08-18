@@ -150,6 +150,8 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
         assert type(enr_response_dct['registrationData']) is str
 
         client_data_b64 = enr_response_dct['clientData']
+        registration_response_b64 = enr_response_dct['registrationData']
+
         client_data_raw = WS64_decode(client_data_b64)
         client_data_str = UTF8_decode(client_data_raw)
         client_data_dct = JSON_decode(client_data_str)
@@ -162,7 +164,6 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
         assert WS64_decode(client_data_dct['challenge']) == transaction_nonce
         facetid = client_data_dct['origin']
 
-        registration_response_b64 = enr_response_dct['registrationData']
         registration_response_raw = WS64_decode(registration_response_b64)
         assert len(registration_response_raw) >= 67
         assert registration_response_raw[0] == 0x05
@@ -171,25 +172,19 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
         L = registration_response_raw[66]
         assert len(registration_response_raw) >= 67 + L
         keyhandle = registration_response_raw[67:67+L]
-        certificate, attestation_signature = extract_one_DER_encoded_value(
-                registration_response_raw[67+L:]
+        certificate, signature_to_verify = extract_one_DER_encoded_value(
+            registration_response_raw[67+L:]
         )
-        attestation_publickey_Q = x509decode_p256ecdsa_publickey(certificate)
+        attest_pubkey_Q = x509decode_p256ecdsa_publickey(certificate)
 
-        application_parameter = sha256(UTF8_encode(app_id))
-        challenge_parameter = sha256(client_data_raw)
-        raw_signature_base = b''.join([
+        data_to_sign = b''.join([
             b'\x00',
-            application_parameter,
-            challenge_parameter,
+            sha256(UTF8_encode(app_id)),  # application parameter
+            sha256(client_data_raw),  # challenge parameter
             keyhandle,
             publickey,
         ])
-        assert is_good_signature(
-            attestation_publickey_Q,
-            raw_signature_base,
-            attestation_signature
-        )
+        assert is_good_signature(attest_pubkey_Q, data_to_sign, signature_to_verify)
 
         return facetid, keyhandle, publickey, certificate
 
@@ -198,7 +193,79 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
 
 
 def process_idassertion_response(app_id, transaction_nonce, ida_response):
-    pass
+    try:
+        ida_response_dct = JSON_decode(ida_response)
+        assert type(ida_response_dct) is dict
+        assert ida_response_dct.keys() >= {'keyHandle', 'clientData', 'signatureData'}
+        assert type(ida_response_dct['keyHandle']) is str
+        assert type(ida_response_dct['clientData']) is str
+        assert type(ida_response_dct['signatureData']) is str
+
+        keyhandle_b64 = ida_response_dct['keyHandle']
+        client_data_b64 = ida_response_dct['clientData']
+        authentication_response_b64 = ida_response_dct['signatureData']
+
+        claimed_keyhandle = WS64_decode(keyhandle_b64)
+
+        # Now we have:
+        #   claimed_keyhandle
+
+        client_data_raw = WS64_decode(client_data_b64)
+        client_data_str = UTF8_decode(client_data_raw)
+        client_data_dct = JSON_decode(client_data_str)
+        assert type(client_data_dct) is dict
+        assert client_data_dct.keys() >= {'typ', 'challenge', 'origin'}
+        assert type(client_data_dct['typ']) is str
+        assert type(client_data_dct['challenge']) is str
+        assert type(client_data_dct['origin']) is str
+        assert client_data_dct['typ'] == 'navigator.id.getAssertion'
+        facetid = client_data_dct['origin']
+        client_data_challenge = WS64_decode(client_data_dct['challenge'])
+        L = len(transaction_nonce)
+        assert len(client_data_challenge) == L + 65 + 1 + 4
+        assert client_data_challenge.startswith(transaction_nonce)
+        claimed_publickey = client_data_challenge[L:L+65]
+        assert client_data_challenge[L+65] in {0, 1}
+        if client_data_challenge[L+65] == 1:
+            claimed_old_counter = int.from_bytes(client_data_challenge[-4:], 'big')
+        else:
+            claimed_old_counter = None
+
+        # Now we have:
+        #   facetid
+        #   client_data_raw
+        #   claimed_publickey
+        #   claimed_old_counter
+
+        authentication_response_raw = WS64_decode(authentication_response_b64)
+        assert len(authentication_response_raw) >= 5
+        assert authentication_response_raw[0] == 1
+        claimed_new_counter_raw = authentication_response_raw[1:5]
+        claimed_new_counter = int.from_bytes(claimed_new_counter_raw, 'big')
+        signature_to_verify = authentication_response_raw[5:]
+
+        # Now we have:
+        #   claimed_new_counter
+        #   signature_to_verify
+
+        data_to_sign = b''.join([
+            sha256(UTF8_encode(app_id)),  # application parameter
+            b'\x01',
+            claimed_new_counter_raw,
+            sha256(client_data_raw),  # challenge parameter
+        ])
+        assert is_good_signature(claimed_publickey, data_to_sign, signature_to_verify)
+
+        return (
+            facetid,
+            claimed_keyhandle,
+            claimed_publickey,
+            claimed_old_counter,
+            claimed_new_counter,
+        )
+
+    except AssertionError as x:
+        raise ValueError from x
 
 
 def UTF8_encode(s):  # str -> bytes
