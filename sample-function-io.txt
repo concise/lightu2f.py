@@ -4,45 +4,46 @@ FUNCTION generate_enrollment_request
 
 INPUT
 
-  APPID =
-    "https://example.com"
+    APPID = (string)
+        "https://example.com"
 
-  nonce =
-    "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
+    nonce = (octet string of length 32)
+        "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
 
-  user_u2f_keys_snapshot_khonly =
-    [
-      "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
-      "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA"
-    ]
+    user_u2f_keys_snapshot_khonly = (an native object supporting one-time enumeration)
+        [
+          "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+          "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA"
+        ]
+        (each element is an octet string of length 0~255)
 
 OUTPUT
 
-  enrollment_request = <a JSON stringified text representing>
-    {
-      "type": "u2f_register_request",
-      "registerRequests": [
+    enrollment_request = (string, which will be interpreted using JSON)
         {
-          "appId": "https://example.com",
-          "challenge": "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is",
-          "version": "U2F_V2"
+          "type": "u2f_register_request",
+          "registerRequests": [
+            {
+              "appId": "https://example.com",
+              "challenge": "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is",
+              "version": "U2F_V2"
+            }
+          ],
+          "signRequests": [
+            {
+              "appId": "https://example.com",
+              "challenge": "",
+              "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+              "version": "U2F_V2"
+            },
+            {
+              "appId": "https://example.com",
+              "challenge": "",
+              "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
+              "version": "U2F_V2"
+            }
+          ]
         }
-      ],
-      "signRequests": [
-        {
-          "appId": "https://example.com",
-          "challenge": "",
-          "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
-          "version": "U2F_V2"
-        },
-        {
-          "appId": "https://example.com",
-          "challenge": "",
-          "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
-          "version": "U2F_V2"
-        }
-      ]
-    }
 
 ------------------------------------------------------------------------------
 
@@ -50,51 +51,53 @@ FUNCTION generate_signature_request
 
 INPUT
 
-  APPID =
-    "https://example.com"
+    APPID = (string)
+        "https://example.com"
 
-  nonce =
-    "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
+    nonce = (octet string of length 32)
+        "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
 
-  user_u2f_keys_snapshot_full =
-    {
-      "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ": {
-        "counter": 1351036020,
-        "publickey": "BFALLOsLJbZHqgihAdNGeEGxCii2tgA4C81NYQLlsO2C6zdFwoD7DGVMtdQcsJuL7ep4jgVYOU7GSlzqehG_CeA"
-      },
-      "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA": {
-        "counter": null,
-        "publickey": "BD9G13wnIw_Tfii9nd7gQvnWDTNhTc4Ry4-N-7rMjMxB6chte4wi43fG_jMsm3XhsTLhd-r8bS4b0S5q0ATlisE"
-      }
-    }
+    user_u2f_keys_snapshot_full = (an native object supporting one-time enumeration)
+        [
+          {
+            "counter": 1351036020,
+            "keyhandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+            "publickey": "BFALLOsLJbZHqgihAdNGeEGxCii2tgA4C81NYQLlsO2C6zdFwoD7DGVMtdQcsJuL7ep4jgVYOU7GSlzqehG_CeA"
+          },
+          {
+            "counter": null,
+            "keyhandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
+            "publickey": "BD9G13wnIw_Tfii9nd7gQvnWDTNhTc4Ry4-N-7rMjMxB6chte4wi43fG_jMsm3XhsTLhd-r8bS4b0S5q0ATlisE"
+          }
+        ]
+        (each element is a collection of a counter, keyhandle, and publickey)
 
 OUTPUT
 
-  signature_request = <a JSON stringified text representing>
-    {
-      "type": "u2f_sign_request",
-      "signRequests": [
+    signature_request = (string, which will be interpreted using JSON)
         {
-          "appId": "https://example.com",
-          "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEUAss6wsltkeqCKEB00Z4QbEKKLa2ADgLzU1hAuWw7YLrN0XCgPsMZUy11Bywm4vt6niOBVg5TsZKXOp6Eb8J4AFQhyx0",
-          "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
-          "version": "U2F_V2"
-        },
-        {
-          "appId": "https://example.com",
-          "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEP0bXfCcjD9N-KL2d3uBC-dYNM2FNzhHLj437usyMzEHpyG17jCLjd8b-MyybdeGxMuF36vxtLhvRLmrQBOWKwQAAAAAA",
-          "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
-          "version": "U2F_V2"
+          "type": "u2f_sign_request",
+          "signRequests": [
+            {
+              "appId": "https://example.com",
+              "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEUAss6wsltkeqCKEB00Z4QbEKKLa2ADgLzU1hAuWw7YLrN0XCgPsMZUy11Bywm4vt6niOBVg5TsZKXOp6Eb8J4AFQhyx0",
+              "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+              "version": "U2F_V2"
+            },
+            {
+              "appId": "https://example.com",
+              "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEP0bXfCcjD9N-KL2d3uBC-dYNM2FNzhHLj437usyMzEHpyG17jCLjd8b-MyybdeGxMuF36vxtLhvRLmrQBOWKwQAAAAAA",
+              "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
+              "version": "U2F_V2"
+            }
+          ]
         }
-      ]
-    }
 
-  The value websafe-base64-encoded in the "challenge" string is a 102-byte value
-  constructed from concatenating <nonce> | <publickey> | <signaturecounterinfo>
-
-  where the <signaturecounterinfo> is a 5-byte value defined as:
-    case <counter> != null -> 0x01 | <counter>
-    case <counter> == null -> 0x00 | 0x00000000
+    The value websafe-base64-encoded in the "challenge" string is a 102-byte value
+    constructed from concatenating <nonce> | <publickey> | <signaturecounterinfo>
+    where the <signaturecounterinfo> is a 5-byte value defined as:
+        case <counter> != null -> 0x01 | <counter>
+        case <counter> == null -> 0x00 | 0x00000000
 
 ------------------------------------------------------------------------------
 
@@ -102,37 +105,44 @@ FUNCTION process_enrollment_response
 
 INPUT
 
-  APPID =
-    "https://example.com"
+    APPID = (string)
+        "https://example.com"
 
-  nonce =
-    "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
-    (_MUST_ equal what we have used in the current U2F enrollment transaction)
+    nonce = (octet string of length 32)
+        "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
+        (_MUST_ equal what we have used in the current U2F enrollment transaction)
 
-  enrollment_response = <a JSON stringified text representing>
-    {
-      "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-      "registrationData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    }
+    enrollment_response = (string, which will be interpreted using JSON)
+        {
+          "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "registrationData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        }
 
 OUTPUT (if no error)
 
-  keyhandle =
+    facetid = (string)
+        ...
+
+    keyhandle = (octet string of length 0~255)
+        ...
+
+    publickey = (octet string of length 65)
+        ...
+
+    certificate = (octet string, which can be interpreted using DER)
+        ...
+
+POSSIBLE ERRORS
+
     ...
 
-  publickey =
-    ...
+NOTICE
 
-  facet =
-    ...
-
-  certificate =
-    ...
-
-NOTE
-
-  1. you must check the facet by yourself
-  2. you must store the info into database while preventing keyhandle collision
+    0. you must maintain the integrity of nonce for this enrollment transaction
+    1. you must check the facetid by yourself
+    2. you must store the info into database while preventing keyhandle collision
+    3. to verify the attestation certificate chain or not, is up to you
+    4. to store the certificate along with other metadata or not is up to you
 
 ------------------------------------------------------------------------------
 
@@ -140,42 +150,48 @@ FUNCTION process_signature_response
 
 INPUT
 
-  APPID =
-    "https://example.com"
+    APPID = (string)
+        "https://example.com"
 
-  nonce =
-    "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
+    nonce = (octet string of length 32)
+        "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
+        (_MUST_ equal what we have used in the current U2F signature transaction)
 
-  signature_response = <a JSON stringified text representing>
-    {
-      "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-      "keyHandle": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-      "signatureData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-    }
+    signature_response = (string, which will be interpreted using JSON)
+        {
+          "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "keyHandle": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+          "signatureData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+        }
 
 OUTPUT (if no error)
 
-  keyhandle =
+    facetid = (string)
+        ...
+
+    keyhandle = (octet string of length 0~255)
+        ...
+
+    publickey = (octet string of length 65)
+        ...
+
+    oldcounter = (null or a 32-bit unsigned integer)
+        ...
+
+    newcounter = (null or a 32-bit unsigned integer)
+        ...
+
+POSSIBLE ERRORS
+
     ...
 
-  publickey =
-    ...
+NOTICE
 
-  oldcounter =
-    ...
-
-  newcounter =
-    ...
-
-  facet =
-    ...
-
-NOTE
-
-  1. you must check the facet by yourself
-  2. you must apply your own cloning prevention policy on the counter
-  3. you must check whether or not (keyhandle, publickey, oldcounter) is in DB,
-     if so, then you can replace oldcounter with newcounter
-     if not, it is an error
+    0. you must maintain the integrity of nonce for this signature transaction
+    1. you must check the facetid by yourself
+    2. you must apply your own cloning prevention policy for counter validity...
+       please note oldcounter might be null, which is valid for any newcounter
+    3. you must check whether or not (keyhandle, publickey, oldcounter) is in DB;
+       if so, you can replace oldcounter with newcounter; if no, it is an error
 
 ------------------------------------------------------------------------------
