@@ -1,0 +1,111 @@
+------------------------------------------------------------------------------
+
+FUNCTION generate_enrollment_request
+
+INPUT
+
+  APPID =
+    "https://example.com"
+
+  nonce =
+    "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
+
+  user_u2f_keys_snapshot_khonly =
+    [
+      "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+      "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA"
+    ]
+
+OUTPUT
+
+  enrollment_request =
+    {
+      "type": "u2f_register_request",
+      "registerRequests": [
+        {
+          "appId": "https://example.com",
+          "challenge": "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is",
+          "version": "U2F_V2"
+        }
+      ],
+      "signRequests": [
+        {
+          "appId": "https://example.com",
+          "challenge": "",
+          "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+          "version": "U2F_V2"
+        },
+        {
+          "appId": "https://example.com",
+          "challenge": "",
+          "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
+          "version": "U2F_V2"
+        }
+      ]
+    }
+
+------------------------------------------------------------------------------
+
+FUNCTION generate_signature_request
+
+INPUT
+
+  APPID =
+    "https://example.com"
+
+  nonce =
+    "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
+
+  user_u2f_keys_snapshot_full =
+    {
+      "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ": {
+        "counter": 1351036020,
+        "publickey": "BFALLOsLJbZHqgihAdNGeEGxCii2tgA4C81NYQLlsO2C6zdFwoD7DGVMtdQcsJuL7ep4jgVYOU7GSlzqehG_CeA"
+      },
+      "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA": {
+        "counter": null,
+        "publickey": "BD9G13wnIw_Tfii9nd7gQvnWDTNhTc4Ry4-N-7rMjMxB6chte4wi43fG_jMsm3XhsTLhd-r8bS4b0S5q0ATlisE"
+      }
+    }
+
+OUTPUT
+
+  signature_request =
+    {
+      "type": "u2f_sign_request",
+      "signRequests": [
+        {
+          "appId": "https://example.com",
+          "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEUAss6wsltkeqCKEB00Z4QbEKKLa2ADgLzU1hAuWw7YLrN0XCgPsMZUy11Bywm4vt6niOBVg5TsZKXOp6Eb8J4AFQhyx0",
+          "keyHandle": "dSF47SwLTLJsiDgxyQycz1x1wMMYdH43me4KliunkvOTvv3eM7vEYWipMvSevQpMZYhhSUzuvNoMjdifpvslJQ",
+          "version": "U2F_V2"
+        },
+        {
+          "appId": "https://example.com",
+          "challenge": "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQYEP0bXfCcjD9N-KL2d3uBC-dYNM2FNzhHLj437usyMzEHpyG17jCLjd8b-MyybdeGxMuF36vxtLhvRLmrQBOWKwQAAAAAA",
+          "keyHandle": "l5noHAqdGVR0yEbgXuHmthfiTBalYp08PbTCiwZwok3Kf1NoPmSvd0V93HQo4_fMmf2qYUvCzY2xj8jWPXSXhA",
+          "version": "U2F_V2"
+        }
+      ]
+    }
+
+  The value websafe-base64-encoded in the "challenge" string is a 102-byte value
+  constructed from concatenating <nonce> | <publickey> | <signaturecounterinfo>
+
+  where the <signaturecounterinfo> is a 5-byte value defined as:
+    case <counter> != null -> 0x01 | <counter>
+    case <counter> == null -> 0x00 | 0x00000000
+
+------------------------------------------------------------------------------
+
+FUNCTION process_enrollment_response
+INPUT
+OUTPUT
+
+------------------------------------------------------------------------------
+
+FUNCTION process_signature_response
+INPUT
+OUTPUT
+
+------------------------------------------------------------------------------
