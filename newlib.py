@@ -268,6 +268,14 @@ def process_idassertion_response(app_id, transaction_nonce, ida_response):
         raise ValueError from x
 
 
+def WS64_encode(raw):  # bytes -> str
+    return base64.urlsafe_b64encode(raw).rstrip(b'=').decode()
+
+
+def WS64_decode(txt):  # str -> bytes ^ ValueError
+    return base64.urlsafe_b64decode(txt + '==')
+
+
 def UTF8_encode(s):  # str -> bytes
     return s.encode()
 
@@ -288,14 +296,6 @@ def JSON_decode(txt):  # str -> ? ^ ValueError
         return json.loads(txt)
     except json.decoder.JSONDecodeError as x:
         raise ValueError from x
-
-
-def WS64_encode(raw):  # bytes -> str
-    return base64.urlsafe_b64encode(raw).rstrip(b'=').decode()
-
-
-def WS64_decode(txt):  # str -> bytes ^ ValueError
-    return base64.urlsafe_b64decode(txt + '==')
 
 
 
