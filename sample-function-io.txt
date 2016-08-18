@@ -1,11 +1,5 @@
 ------------------------------------------------------------------------------
 
-There are two different types of U2F transactions
-    1.  enrollment transaction
-    2.  idassertion transaction
-
-------------------------------------------------------------------------------
-
 FUNCTION generate_enrollment_request
 
 INPUT
