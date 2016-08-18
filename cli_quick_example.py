@@ -1,67 +1,57 @@
-#!/usr/bin/env python3
-#
-# python3 example_enroll.py ticket_id comman-separated-key-handle-list-in-hex-format
-#
-
 from newlib import *
 from os import urandom
-import sys
 
-args = sys.argv[1:]
 
-if len(args) != 2:
-    print('Usage:')
-    print('\tcli_enroll_example.py arg1 arg2')
+def step1():
+    ticket = urandom(32)
+    already_registered_keys = []
+    request = generate_enrollment_request('https://jong.sh', ticket, already_registered_keys)
+    print('ticket = "' + ticket.hex() + '"')
+    print('request = ' + request)
     print()
-    print('\targ1 = <your application identity>')
-    print('\targ2 = <a comma-separated list of zero or more key handles in hex>')
-    sys.exit(1)
+    print('''To send the request to the U2F client in Chrome:
 
-APP_ID = args[0]
+var request = %s;
 
-if args[1].strip() != '':
-    already_registered_key_handles = [bytes.fromhex(kh_hex) for kh_hex in args[1].strip().split(',')]
-else:
-    already_registered_key_handles = []
+(()=>{
+  // run google-chrome with --show-component-extension-options to see
+  // the extension ID of "CryptoTokenExtension" builtin extension
+  var ID = 'kmendfapggjehodndflmmgagdbamhnfd';
+  var i = 1, p = window.p = chrome.runtime.connect(ID);
+  p.onMessage.addListener((response)=>{
+    console.log('a response from U2F Client is saved at `r' + i + '`');
+    window['r' + i] = JSON.stringify(response.responseData);
+    ++i;
+  });
+  console.log('Use p.postMessage(...) to make U2F requests');
+})();
 
-ticket = urandom(32)
-request = generate_enrollment_request(APP_ID, ticket, already_registered_key_handles)
-print()
-print('Here is a request message for enrolling a U2F security key:')
-print()
-print(request)
-print()
-print('Please enter the response message from a U2F client in one line:')
-print()
-response = raw_input()
-print()
-try:
-    facetid, keyhandle, publickey, *_ = process_enrollment_response(APP_ID, ticket, response)
-except ValueError:
-    print('The above U2F enrollment response message is invalid!')
-    sys.exit(0)
-else:
-    print('The above U2F enrollment response message is valid')
-    print('facetid =', facetid)
-    print('keyhandle =', keyhandle.hex())
-    print('publickey =', publickey.hex())
-    print()
-    print('Now you have to make sure that\n'
-        '(1) facetid matches your service\n'
-        '(2) keyhandle does not collide with previously registered one\n'
-        'and you can store <keyhandle, publickey> into DB for the user'
-    )
-    sys.exit(0)
+p.postMessage(request);
+''' % request)
 
+
+def step2(ticket, response):
+    if type(ticket) is not bytes:
+        ticket = bytes.fromhex(ticket)
+    if type(response) is not str:
+        import json
+        response = json.dumps(response)
+    try:
+        facetid, keyhandle, publickey, cert, cidinfo = process_enrollment_response('https://jong.sh', ticket, response)
+    except ValueError:
+        print('the provided enrollment response message is invalid')
+    else:
+        print('the provided enrollment response message is valid')
+        print('keyhandle =', keyhandle.hex())
+        print('publickey =', publickey.hex())
+        print('facetid =', facetid)
+
+import sys;sys.exit(0)
 
 
 
+    # Transaction 1: Let's register a new U2F security key
 
-# Transaction 1: Let's register a new U2F security key
-
-ticket = urandom(32)
-already_registered_keys = []
-request = generate_enrollment_request('https://jong.sh', ticket, already_registered_keys)
 print('ticket =', repr(ticket.hex()))
 print('request =', request)
 
