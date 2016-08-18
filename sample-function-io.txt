@@ -18,7 +18,7 @@ INPUT
 
 OUTPUT
 
-  enrollment_request =
+  enrollment_request = <a JSON stringified text representing>
     {
       "type": "u2f_register_request",
       "registerRequests": [
@@ -70,7 +70,7 @@ INPUT
 
 OUTPUT
 
-  signature_request =
+  signature_request = <a JSON stringified text representing>
     {
       "type": "u2f_sign_request",
       "signRequests": [
@@ -99,13 +99,83 @@ OUTPUT
 ------------------------------------------------------------------------------
 
 FUNCTION process_enrollment_response
+
 INPUT
-OUTPUT
+
+  APPID =
+    "https://example.com"
+
+  nonce =
+    "pSmEofYQn6TTonPExb1yEC8Z7coLMxRS8djrQr7q6is"
+    (_MUST_ equal what we have used in the current U2F enrollment transaction)
+
+  enrollment_response = <a JSON stringified text representing>
+    {
+      "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "registrationData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+
+OUTPUT (if no error)
+
+  keyhandle =
+    ...
+
+  publickey =
+    ...
+
+  facet =
+    ...
+
+  certificate =
+    ...
+
+NOTE
+
+  1. you must check the facet by yourself
+  2. you must store the info into database while preventing keyhandle collision
 
 ------------------------------------------------------------------------------
 
 FUNCTION process_signature_response
+
 INPUT
-OUTPUT
+
+  APPID =
+    "https://example.com"
+
+  nonce =
+    "Eh_cSBFRtP71Gdc6ZIePkEvK_Hi2-u_NF7FL24gUQQY"
+
+  signature_response = <a JSON stringified text representing>
+    {
+      "clientData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "keyHandle": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "signatureData": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    }
+
+OUTPUT (if no error)
+
+  keyhandle =
+    ...
+
+  publickey =
+    ...
+
+  oldcounter =
+    ...
+
+  newcounter =
+    ...
+
+  facet =
+    ...
+
+NOTE
+
+  1. you must check the facet by yourself
+  2. you must apply your own cloning prevention policy on the counter
+  3. you must check whether or not (keyhandle, publickey, oldcounter) is in DB,
+     if so, then you can replace oldcounter with newcounter
+     if not, it is an error
 
 ------------------------------------------------------------------------------
