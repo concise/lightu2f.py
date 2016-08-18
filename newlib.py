@@ -163,6 +163,10 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
         assert client_data_dct['typ'] == 'navigator.id.finishEnrollment'
         assert WS64_decode(client_data_dct['challenge']) == transaction_nonce
         facetid = client_data_dct['origin']
+        cidinfo = (
+            JSON_encode(client_data_dct['cid_pubkey'])
+            if 'cid_pubkey' in client_data_dct else None
+        )
 
         registration_response_raw = WS64_decode(registration_response_b64)
         assert len(registration_response_raw) >= 67
@@ -186,7 +190,7 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
         ])
         assert is_good_signature(attest_pubkey_Q, data_to_sign, signature_to_verify)
 
-        return facetid, keyhandle, publickey, certificate
+        return facetid, keyhandle, publickey, certificate, cidinfo
 
     except AssertionError as x:
         raise ValueError from x
@@ -230,6 +234,10 @@ def process_idassertion_response(app_id, transaction_nonce, ida_response):
             claimed_old_counter = int.from_bytes(client_data_challenge[-4:], 'big')
         else:
             claimed_old_counter = None
+        cidinfo = (
+            JSON_encode(client_data_dct['cid_pubkey'])
+            if 'cid_pubkey' in client_data_dct else None
+        )
 
         # Now we have:
         #   facetid
@@ -262,6 +270,7 @@ def process_idassertion_response(app_id, transaction_nonce, ida_response):
             claimed_publickey,
             claimed_old_counter,
             claimed_new_counter,
+            cidinfo
         )
 
     except AssertionError as x:
