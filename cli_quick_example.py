@@ -1,6 +1,34 @@
-from os import urandom
+#!/usr/bin/env python3
+#
+# python3 example_enroll.py ticket_id comman-separated-key-handle-list-in-hex-format
+#
 
-from newlib import generate_enrollment_request, generate_idassertion_request, process_enrollment_response, process_idassertion_response
+from newlib import *
+from os import urandom
+import sys
+
+args = sys.argv[1:]
+
+if len(args) != 2:
+    print('Usage:')
+    print('\tcli_quick_example.py arg1 arg2')
+    print()
+    print('\targ1 = <your application identity>')
+    print('\targ2 = <a comma-separated list of hex key handles>')
+    sys.exit(1)
+
+app_id = args[0]
+
+if args[1].strip() != '':
+    already_registered_key_handles = [bytes.fromhex(kh_hex) for kh_hex in args[1].strip().split(',')]
+else:
+    already_registered_key_handles = []
+
+print(app_id, already_registered_key_handles)
+sys.exit(0)
+
+
+
 
 
 # Transaction 1: Let's register a new U2F security key
