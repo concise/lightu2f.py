@@ -1,3 +1,12 @@
+WARNING:
+This project is still in its pre-alpha stage.
+Serious refactoring and documentations are needed.
+
+
+
+lightu2f.py is a zero-dependency FIDO U2F relying party library
+---------------------------------------------------------------
+
 There are two different types of U2F transactions between a U2F Relying Party
 and a U2F Client: authenticator enrollment transactions and identity assertion
 transactions.
