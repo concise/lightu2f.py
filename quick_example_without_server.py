@@ -97,7 +97,7 @@ def update_existing_key_into(kh, pk, cnt_old, cnt_new):
                 print('Key info updated successfully')
             else:
                 print('Error: old counter does not match')
-                print('the database shows cnt_old = %d', c)
+                print('the database shows cnt_old = %d' % c)
             return
     print('Error: no such key exists')
     print()
