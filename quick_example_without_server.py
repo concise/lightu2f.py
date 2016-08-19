@@ -1,4 +1,4 @@
-import newlib
+import lightu2f
 import os
 
 
@@ -11,7 +11,7 @@ ticket2 = os.urandom(32)
 def generate_registration_request():
     global request
     khs = [kh for kh, pk, cnt in registered_keys]
-    request = newlib.generate_enrollment_request(APPID, ticket1, khs)
+    request = lightu2f.generate_enrollment_request(APPID, ticket1, khs)
     print('''// To send the request to the U2F client in Chrome
 
 var request = %s;
@@ -25,7 +25,7 @@ def process_registration_response(response):
         import json
         response = json.dumps(response)
     try:
-        facetid, keyhandle, publickey, cert, cidinfo = newlib.process_enrollment_response(APPID, ticket1, response)
+        facetid, keyhandle, publickey, cert, cidinfo = lightu2f.process_enrollment_response(APPID, ticket1, response)
     except ValueError:
         print()
         print('the provided enrollment response message is invalid')
@@ -51,7 +51,7 @@ def store_new_key_info(keyhandle, publickey):
 
 def generate_authentication_request():
     global request
-    request = newlib.generate_idassertion_request(APPID, ticket2, registered_keys)
+    request = lightu2f.generate_idassertion_request(APPID, ticket2, registered_keys)
     print()
     print('''// To send the request to the U2F client in Chrome
 
@@ -68,7 +68,7 @@ def process_authentication_response(response):
     try:
         (
             facetid, kh, pk, cnt_old, cnt_new, cidinfo
-        ) = newlib.process_idassertion_response(APPID, ticket2, response)
+        ) = lightu2f.process_idassertion_response(APPID, ticket2, response)
     except ValueError:
         print()
         print('the provided enrollment response message is invalid')
