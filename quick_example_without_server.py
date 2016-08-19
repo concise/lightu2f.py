@@ -1,5 +1,7 @@
-import lightu2f
+import json
 import os
+
+import lightu2f
 
 
 APPID = 'https://jong.sh'
@@ -22,7 +24,6 @@ p.postMessage(request);
 def process_registration_response(response):
     global keyhandle, publickey, facetid
     if type(response) is not str:
-        import json
         response = json.dumps(response)
     try:
         facetid, keyhandle, publickey, cert, cidinfo = lightu2f.process_enrollment_response(APPID, ticket1, response)
@@ -63,7 +64,6 @@ p.postMessage(request);
 def process_authentication_response(response):
     global facetid, kh, pk, cnt_old, cnt_new, cidinfo
     if type(response) is not str:
-        import json
         response = json.dumps(response)
     try:
         (
