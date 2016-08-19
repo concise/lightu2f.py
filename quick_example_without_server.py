@@ -1,3 +1,8 @@
+"""
+This script is intended to be executed as `python3 -i <path-to-script>`
+"""
+
+
 import json
 import os
 
