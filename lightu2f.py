@@ -191,7 +191,10 @@ def WS64_encode(raw):  # bytes -> str
 
 
 def WS64_decode(txt):  # str -> bytes ^ ValueError
-    return base64.urlsafe_b64decode(txt + '==')
+    try:
+        return base64.urlsafe_b64decode(txt + '==')
+    except base64.binascii.Error as x:
+        raise ValueError from x
 
 
 def UTF8_encode(s):  # str -> bytes
