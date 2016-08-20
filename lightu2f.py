@@ -192,16 +192,22 @@ def WS64_encode(raw):  # bytes -> str
 
 def WS64_decode(txt):  # str -> bytes ^ ValueError
     try:
-        return base64.urlsafe_b64decode(txt + '==')
+        result = base64.urlsafe_b64decode(txt + '==')
+        assert WS64_encode(result) == txt
+        return result
+    except AssertionError as x:
+        raise ValueError from x
     except base64.binascii.Error as x:
         raise ValueError from x
 
 
 def UTF8_encode(s):  # str -> bytes
+    # NOTE we _MAY_ choose to restrict the input to only ASCII printable characters
     return s.encode()
 
 
 def UTF8_decode(x):  # bytes -> str ^ ValueError
+    # NOTE we _MAY_ choose to restrict the input to only ASCII printable characters
     try:
         return x.decode()
     except UnicodeDecodeError as x:
