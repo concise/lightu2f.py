@@ -101,8 +101,8 @@ def process_enrollment_response(app_id, transaction_nonce, enr_response):
 
         return facetid, keyhandle, publickey, certificate, cidinfo
 
-    except AssertionError as x:
-        raise ValueError from x
+    except AssertionError:
+        raise ValueError from None
 
 
 def process_idassertion_response(app_id, transaction_nonce, ida_response):
@@ -182,8 +182,8 @@ def process_idassertion_response(app_id, transaction_nonce, ida_response):
             cidinfo
         )
 
-    except AssertionError as x:
-        raise ValueError from x
+    except AssertionError:
+        raise ValueError from None
 
 
 def WS64_encode(raw):  # bytes -> str
@@ -195,10 +195,10 @@ def WS64_decode(txt):  # str -> bytes ^ ValueError
         result = base64.urlsafe_b64decode(txt + '==')
         assert WS64_encode(result) == txt
         return result
-    except AssertionError as x:
-        raise ValueError from x
-    except base64.binascii.Error as x:
-        raise ValueError from x
+    except AssertionError:
+        raise ValueError from None
+    except base64.binascii.Error:
+        raise ValueError from None
 
 
 def UTF8_encode(s):  # str -> bytes
@@ -210,8 +210,8 @@ def UTF8_decode(x):  # bytes -> str ^ ValueError
     # NOTE we _MAY_ choose to restrict the input to only ASCII printable characters
     try:
         return x.decode()
-    except UnicodeDecodeError as x:
-        raise ValueError from x
+    except UnicodeDecodeError:
+        raise ValueError from None
 
 
 def JSON_encode(val):  # ? -> str
@@ -221,8 +221,8 @@ def JSON_encode(val):  # ? -> str
 def JSON_decode(txt):  # str -> ? ^ ValueError
     try:
         return json.loads(txt)
-    except json.decoder.JSONDecodeError as x:
-        raise ValueError from x
+    except json.decoder.JSONDecodeError:
+        raise ValueError from None
 
 
 
@@ -642,10 +642,10 @@ def DER_extract_identifier_octets(stream):
             else:
                 assert stream[1] & 0b01111111 != 0
             return stream[:l+2], stream[l+2:]
-    except AssertionError as x:
-        raise ValueError from x
-    except StopIteration as x:
-        raise ValueError from x
+    except AssertionError:
+        raise ValueError from None
+    except StopIteration:
+        raise ValueError from None
 
 
 def DER_extract_length_octets(stream):
@@ -659,8 +659,8 @@ def DER_extract_length_octets(stream):
             assert len(stream) >= l + 1
             assert (l == 1 and stream[1] >= 128) or (l > 1 and stream[1] != 0)
             return stream[:l+1], stream[l+1:]
-    except AssertionError as x:
-        raise ValueError from x
+    except AssertionError:
+        raise ValueError from None
 
 
 def DER_decode_length_octets(length_octets):
